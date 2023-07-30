@@ -12,13 +12,14 @@
 package de.linzn.mediaStream;
 
 
+import de.stem.stemSystem.STEMSystemApp;
 import de.stem.stemSystem.modules.pluginModule.STEMPlugin;
 
 
 public class MediaStreamPlugin extends STEMPlugin {
 
     public static MediaStreamPlugin mediaStreamPlugin;
-
+    private MediaManager mediaManager;
 
     public MediaStreamPlugin() {
         mediaStreamPlugin = this;
@@ -26,10 +27,22 @@ public class MediaStreamPlugin extends STEMPlugin {
 
     @Override
     public void onEnable() {
-
+        this.mediaManager = new MediaManager();
+        STEMSystemApp.getInstance().getEventModule().getStemEventBus().register(new MediaListener());
+        this.initConfig();
     }
 
     @Override
     public void onDisable() {
+    }
+
+    public MediaManager getMediaManager() {
+        return mediaManager;
+    }
+
+    private void initConfig() {
+        this.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
+        this.getDefaultConfig().getString("amplifier.hardwareAddress", "xxxxx");
+        this.getDefaultConfig().save();
     }
 }
