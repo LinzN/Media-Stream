@@ -21,7 +21,7 @@ public class MediaListener {
             STEMSystemApp.LOGGER.CORE("Initialize WiiM Device status: " + event.getNewStatus());
             String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
             LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-            ledDevice.setLEDMode(3, 0, 0, 0);
+            ledDevice.setLEDMode(4, 0, 0, 0);
         } else {
             STEMSystemApp.LOGGER.CORE("Wiim Device status changed from: " + event.getOldStatus() + " to: " + event.getNewStatus());
             if (!event.getOldStatus().equalsIgnoreCase(event.getNewStatus())) {
@@ -32,7 +32,11 @@ public class MediaListener {
                 } else if (event.getNewStatus().equalsIgnoreCase("play")) {
                     String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
                     LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-                    ledDevice.setLEDMode(2, 0, 0, 0);
+                    if(event.getMode() == 5){
+                        ledDevice.setLEDMode(2, 255,0,0);
+                    } else {
+                        ledDevice.setLEDMode(1, 10,10,10);
+                    }
 
                     String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
                     MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
@@ -67,7 +71,11 @@ public class MediaListener {
         mqttSwitch.switchDevice(true);
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-        ledDevice.setLEDMode(2, 255,0,0);
+        if(event.getMode() == 5){
+            ledDevice.setLEDMode(2, 255,0,0);
+        } else {
+            ledDevice.setLEDMode(1, 10,10,10);
+        }
 
     }
 

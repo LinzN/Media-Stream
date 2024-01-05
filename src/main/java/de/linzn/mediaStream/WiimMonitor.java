@@ -13,8 +13,8 @@ public class WiimMonitor implements Runnable {
     private MediaManager mediaManager;
 
     private String status = null;
-    //private Date lastStatusSwitch = null;
-    //private long msToStandby = 1000L * 60 * 3;
+
+    private int mode = -1;
 
     private AtomicBoolean isStandby = null;
 
@@ -34,54 +34,20 @@ public class WiimMonitor implements Runnable {
                 if (this.isStandby.get()) {
                     STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStandbyEvent());
                 } else {
-                    STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimActiveEvent());
+                    int mode = this.mediaManager.getWiimAPI().getWiimPlayer().get_mode();
+                    STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimActiveEvent(mode));
                 }
             }
 
             String newStatus = this.mediaManager.getWiimAPI().getWiimPlayer().get_status();
+            int newMode = this.mediaManager.getWiimAPI().getWiimPlayer().get_mode();
 
-            if (!newStatus.equalsIgnoreCase(status)) {
-                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStatusChangedEvent(status, newStatus));
+
+            if (!newStatus.equalsIgnoreCase(status) || newMode != mode) {
+                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStatusChangedEvent(status, newStatus, newMode));
                 this.status = newStatus;
+                this.mode = newMode;
             }
         }
     }
-/*
-    @Override
-    public void run() {
-        String newStatus = this.mediaManager.getWiimAPI().getWiimPlayer().get_status();
-        boolean isInitializing = false;
-        if (this.status == null) {
-            isInitializing = true;
-        }
-
-        if (!newStatus.equalsIgnoreCase(status)) {
-            STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStatusChangedEvent(status, newStatus));
-            this.status = newStatus;
-            this.lastStatusSwitch = new Date();
-            if (!isInitializing && this.isStandby.get() && this.status.equalsIgnoreCase("play")) {
-                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimActiveEvent());
-            }
-            this.isStandby = new AtomicBoolean(false);
-        }
-
-        if (isInitializing) {
-            STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimInitializeEvent(newStatus));
-            if (this.status.equalsIgnoreCase("Stop")) {
-                this.isStandby = new AtomicBoolean(true);
-                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStandbyEvent());
-            } else if (this.status.equalsIgnoreCase("Play")) {
-                this.isStandby = new AtomicBoolean(false);
-                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimActiveEvent());
-            }
-        }
-
-        if (this.status.equalsIgnoreCase("stop")) {
-            if (!this.isStandby.get() && this.lastStatusSwitch.getTime() + msToStandby < new Date().getTime()) {
-                this.isStandby.set(true);
-                STEMSystemApp.getInstance().getEventModule().getStemEventBus().fireEvent(new WiimStandbyEvent());
-            }
-        }
-    }
-*/
 }
