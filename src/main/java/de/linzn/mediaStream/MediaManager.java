@@ -1,7 +1,19 @@
+/*
+ * Copyright (c) 2025 MirraNET, Niklas Linz. All rights reserved.
+ *
+ * This file is part of the MirraNET project and is licensed under the
+ * GNU Lesser General Public License v3.0 (LGPLv3).
+ *
+ * You may use, distribute and modify this code under the terms
+ * of the LGPLv3 license. You should have received a copy of the
+ * license along with this file. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>
+ * or contact: niklas.linz@mirranet.de
+ */
+
 package de.linzn.mediaStream;
 
+import de.linzn.stem.STEMApp;
 import de.linzn.wiimJavaApi.WiimAPI;
-import de.stem.stemSystem.STEMSystemApp;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,7 +28,7 @@ public class MediaManager {
         this.wiimAPI.setSslCheck(false);
         this.wiimAPI.setPullInterval(500, TimeUnit.MILLISECONDS);
         this.wiimAPI.connect();
-        STEMSystemApp.getInstance().getScheduler().runRepeatScheduler(MediaStreamPlugin.mediaStreamPlugin, new WiimMonitor(this), 20, 1, TimeUnit.SECONDS);
+        STEMApp.getInstance().getScheduler().runRepeatScheduler(MediaStreamPlugin.mediaStreamPlugin, new WiimMonitor(this), 20, 1, TimeUnit.SECONDS);
     }
 
     public WiimAPI getWiimAPI() {

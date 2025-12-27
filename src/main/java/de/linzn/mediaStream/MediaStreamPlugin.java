@@ -1,19 +1,20 @@
 /*
- * Copyright (C) 2023. Niklas Linz - All Rights Reserved
- * You may use, distribute and modify this code under the
- * terms of the LGPLv3 license, which unfortunately won't be
- * written for another century.
+ * Copyright (c) 2025 MirraNET, Niklas Linz. All rights reserved.
  *
- * You should have received a copy of the LGPLv3 license with
- * this file. If not, please write to: niklas.linz@enigmar.de
+ * This file is part of the MirraNET project and is licensed under the
+ * GNU Lesser General Public License v3.0 (LGPLv3).
  *
+ * You may use, distribute and modify this code under the terms
+ * of the LGPLv3 license. You should have received a copy of the
+ * license along with this file. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>
+ * or contact: niklas.linz@mirranet.de
  */
 
 package de.linzn.mediaStream;
 
 
-import de.stem.stemSystem.STEMSystemApp;
-import de.stem.stemSystem.modules.pluginModule.STEMPlugin;
+import de.linzn.stem.STEMApp;
+import de.linzn.stem.modules.pluginModule.STEMPlugin;
 
 
 public class MediaStreamPlugin extends STEMPlugin {
@@ -28,7 +29,7 @@ public class MediaStreamPlugin extends STEMPlugin {
     @Override
     public void onEnable() {
         this.mediaManager = new MediaManager();
-        STEMSystemApp.getInstance().getEventModule().getStemEventBus().register(new MediaListener());
+        STEMApp.getInstance().getEventModule().getStemEventBus().register(new MediaListener());
         this.initConfig();
     }
 

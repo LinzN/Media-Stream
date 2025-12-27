@@ -1,3 +1,15 @@
+/*
+ * Copyright (c) 2025 MirraNET, Niklas Linz. All rights reserved.
+ *
+ * This file is part of the MirraNET project and is licensed under the
+ * GNU Lesser General Public License v3.0 (LGPLv3).
+ *
+ * You may use, distribute and modify this code under the terms
+ * of the LGPLv3 license. You should have received a copy of the
+ * license along with this file. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>
+ * or contact: niklas.linz@mirranet.de
+ */
+
 package de.linzn.mediaStream;
 
 import de.linzn.homeDevices.HomeDevicesPlugin;
@@ -8,22 +20,22 @@ import de.linzn.mediaStream.events.WiimActiveEvent;
 import de.linzn.mediaStream.events.WiimApiErrorEvent;
 import de.linzn.mediaStream.events.WiimStandbyEvent;
 import de.linzn.mediaStream.events.WiimStatusChangedEvent;
+import de.linzn.stem.STEMApp;
+import de.linzn.stem.modules.eventModule.handler.StemEventHandler;
+import de.linzn.stem.modules.eventModule.handler.StemEventPriority;
 import de.linzn.wiimJavaApi.exceptions.WiimAPIDataPushException;
-import de.stem.stemSystem.STEMSystemApp;
-import de.stem.stemSystem.modules.eventModule.handler.StemEventHandler;
-import de.stem.stemSystem.modules.eventModule.handler.StemEventPriority;
 
 public class MediaListener {
 
     @StemEventHandler(priority = StemEventPriority.NORMAL)
     public void onWiimStatusChanged(WiimStatusChangedEvent event) {
         if (event.isInitializeEvent()) {
-            STEMSystemApp.LOGGER.CORE("Initialize WiiM Device status: " + event.getNewStatus());
+            STEMApp.LOGGER.CORE("Initialize WiiM Device status: " + event.getNewStatus());
             String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
             LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
             ledDevice.setLEDMode(4, 0, 0, 0);
         } else {
-            STEMSystemApp.LOGGER.CORE("Wiim Device status changed from: " + event.getOldStatus() + " to: " + event.getNewStatus());
+            STEMApp.LOGGER.CORE("Wiim Device status changed from: " + event.getOldStatus() + " to: " + event.getNewStatus());
             if (!event.getOldStatus().equalsIgnoreCase(event.getNewStatus())) {
                 if (event.getNewStatus().equalsIgnoreCase("stop") || event.getNewStatus().equalsIgnoreCase("none")) {
                     String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
@@ -32,16 +44,16 @@ public class MediaListener {
                 } else if (event.getNewStatus().equalsIgnoreCase("play")) {
                     String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
                     LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-                    if(event.getMode() == 5){
-                        ledDevice.setLEDMode(2, 255,0,0);
+                    if (event.getMode() == 5) {
+                        ledDevice.setLEDMode(2, 255, 0, 0);
                     } else {
-                        ledDevice.setLEDMode(1, 10,10,10);
+                        ledDevice.setLEDMode(1, 10, 10, 10);
                     }
 
                     String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
                     MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
                     try {
-                        if(!mqttSwitch.getDeviceStatus()){
+                        if (!mqttSwitch.getDeviceStatus()) {
                             mqttSwitch.switchDevice(true);
                         }
                     } catch (DeviceNotInitializedException e) {
@@ -54,34 +66,34 @@ public class MediaListener {
 
     @StemEventHandler(priority = StemEventPriority.NORMAL)
     public void onWiimStandby(WiimStandbyEvent event) {
-        STEMSystemApp.LOGGER.CORE("Wiim Device is going to standby. Switching off other hardware!");
+        STEMApp.LOGGER.CORE("Wiim Device is going to standby. Switching off other hardware!");
         String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
         MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
         mqttSwitch.switchDevice(false);
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-        ledDevice.setLEDMode(0, 0,0,0);
+        ledDevice.setLEDMode(0, 0, 0, 0);
     }
 
     @StemEventHandler(priority = StemEventPriority.NORMAL)
     public void onWiimActive(WiimActiveEvent event) {
-        STEMSystemApp.LOGGER.CORE("Wiim Device is wakeup from standby. Enable all hardware!");
+        STEMApp.LOGGER.CORE("Wiim Device is wakeup from standby. Enable all hardware!");
         String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
         MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
         mqttSwitch.switchDevice(true);
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-        if(event.getMode() == 5){
-            ledDevice.setLEDMode(2, 255,0,0);
+        if (event.getMode() == 5) {
+            ledDevice.setLEDMode(2, 255, 0, 0);
         } else {
-            ledDevice.setLEDMode(1, 10,10,10);
+            ledDevice.setLEDMode(1, 10, 10, 10);
         }
 
     }
 
     @StemEventHandler(priority = StemEventPriority.NORMAL)
     public void onWiimApiError(WiimApiErrorEvent event) {
-        STEMSystemApp.LOGGER.CORE("Api Error in Wiim device. Fixing device...");
+        STEMApp.LOGGER.CORE("Api Error in Wiim device. Fixing device...");
         String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
         MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
 
