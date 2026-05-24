@@ -29,6 +29,7 @@ public class MediaListener extends DeviceMonitor {
 
     @Override
     protected void onStartedPlaying(PlayerStatus status) {
+        STEMApp.LOGGER.INFO("WiiM device started playing on playback mode: " +  status.getPlaybackMode().name());
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
         if (status.getPlaybackMode() == PlayerStatus.PlaybackMode.AIRPLAY || status.getPlaybackMode() == PlayerStatus.PlaybackMode.CAST) {
@@ -53,14 +54,20 @@ public class MediaListener extends DeviceMonitor {
 
     @Override
     protected void onStopped(PlayerStatus status) {
+        STEMApp.LOGGER.INFO("WiiM device stopped playing!");
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
         ledDevice.setLEDMode(5, 255, 0, 0);
     }
 
     @Override
+    protected void onPollError(Exception error) {
+        STEMApp.LOGGER.WARNING("WiiM device polling error: " + error.getMessage());
+    }
+
+    @Override
     protected void onStandby() {
-        STEMApp.LOGGER.CORE("Wiim Device is going to standby. Switching off other hardware!");
+        STEMApp.LOGGER.INFO("WiiM device is now in standby. Power off all hardware devices!");
         String deviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("amplifier.hardwareAddress");
         MqttSwitch mqttSwitch = (MqttSwitch) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(deviceName);
         mqttSwitch.switchDevice(false);
