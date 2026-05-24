@@ -31,7 +31,7 @@ public class MediaListener extends DeviceMonitor {
     protected void onStartedPlaying(PlayerStatus status) {
         String ledDeviceName = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("led.hardwareAddress");
         LEDDevice ledDevice = (LEDDevice) HomeDevicesPlugin.homeDevicesPlugin.getDeviceManager().getMqttDevice(ledDeviceName);
-        if (status.getPlaybackMode() == PlayerStatus.PlaybackMode.AIRPLAY) {
+        if (status.getPlaybackMode() == PlayerStatus.PlaybackMode.AIRPLAY || status.getPlaybackMode() == PlayerStatus.PlaybackMode.CAST) {
             ledDevice.setLEDMode(2, 255, 0, 0);
         } else {
             ledDevice.setLEDMode(1, 10, 10, 10);

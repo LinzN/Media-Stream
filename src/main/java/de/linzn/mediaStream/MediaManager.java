@@ -22,6 +22,7 @@ public class MediaManager {
     public MediaManager() {
         String ipAddress = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
         this.client = new WiiMClient(ipAddress);
+        this.client.registerLogger(new WiiMStemLogger());
         this.mediaListener = new MediaListener(client);
         this.mediaListener.start(600);
     }
