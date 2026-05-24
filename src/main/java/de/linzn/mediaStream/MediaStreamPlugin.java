@@ -13,7 +13,6 @@
 package de.linzn.mediaStream;
 
 
-import de.linzn.stem.STEMApp;
 import de.linzn.stem.modules.pluginModule.STEMPlugin;
 
 
@@ -29,7 +28,6 @@ public class MediaStreamPlugin extends STEMPlugin {
     @Override
     public void onEnable() {
         this.mediaManager = new MediaManager();
-        STEMApp.getInstance().getEventModule().getStemEventBus().register(new MediaListener());
         this.initConfig();
     }
 

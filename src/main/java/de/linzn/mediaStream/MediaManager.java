@@ -12,26 +12,20 @@
 
 package de.linzn.mediaStream;
 
-import de.linzn.stem.STEMApp;
-import de.linzn.wiimJavaApi.WiimAPI;
+import de.linzn.wiim.api.WiiMClient;
 
-import java.util.concurrent.TimeUnit;
 
 public class MediaManager {
-    private String ipAddress;
-    private WiimAPI wiimAPI;
+    private final WiiMClient client;
+    private final MediaListener mediaListener;
 
     public MediaManager() {
-        this.ipAddress = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
-        this.wiimAPI = new WiimAPI(this.ipAddress);
-        this.wiimAPI.setWiimLogger(new WiimCustomLogger());
-        this.wiimAPI.setSslCheck(false);
-        this.wiimAPI.setPullInterval(500, TimeUnit.MILLISECONDS);
-        this.wiimAPI.connect();
-        STEMApp.getInstance().getScheduler().runRepeatScheduler(MediaStreamPlugin.mediaStreamPlugin, new WiimMonitor(this), 20, 1, TimeUnit.SECONDS);
+        String ipAddress = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
+        this.client = new WiiMClient(ipAddress);
+        this.mediaListener = new MediaListener(client);
     }
 
-    public WiimAPI getWiimAPI() {
-        return this.wiimAPI;
+    public WiiMClient getClient() {
+        return client;
     }
 }

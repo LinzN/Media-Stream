@@ -73,7 +73,7 @@
             </plugin>
         </plugins>
     </build>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <artifactId>media-stream</artifactId>
     <dependencies>
         <dependency>
@@ -91,8 +91,8 @@
         <dependency>
             <groupId>de.linzn</groupId>
             <artifactId>wiim-java-api</artifactId>
-            <version>1.0.1</version>
-            <scope>compile</scope>
+            <version>2.0.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <properties>
