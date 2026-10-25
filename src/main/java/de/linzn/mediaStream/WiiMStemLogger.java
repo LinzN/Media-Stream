@@ -12,33 +12,64 @@
 
 package de.linzn.mediaStream;
 
-import de.linzn.stem.STEMApp;
+import de.linzn.stem.modules.pluginModule.STEMPlugin;
 import de.linzn.wiim.api.IWiiMLogger;
 
+import java.util.Objects;
+
+/**
+ * Routes log output of the WiiM library to the plugin logger. The library logs every failed
+ * poll (several times per second while the device is offline), so repeated identical warnings
+ * are only logged once every 10 minutes.
+ */
 public class WiiMStemLogger implements IWiiMLogger {
+
+    private static final long REPEAT_INTERVAL_MS = 10 * 60 * 1000;
+
+    private final STEMPlugin plugin;
+    private String lastWarning;
+    private long lastWarningTime;
+
+    public WiiMStemLogger(STEMPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public void error(Object o, Exception e) {
-        STEMApp.LOGGER.ERROR(o);
-        if(e != null){
-            STEMApp.LOGGER.ERROR(e);
+        if (e != null) {
+            this.plugin.getPluginLogger().error(String.valueOf(o), e);
+        } else {
+            this.plugin.getPluginLogger().error(String.valueOf(o));
         }
     }
 
     @Override
     public void warning(Object o, Exception e) {
-        STEMApp.LOGGER.WARNING(o);
-        if(e != null){
-            STEMApp.LOGGER.WARNING(e);
+        String message = e != null ? o + ": " + e.getMessage() : String.valueOf(o);
+        if (this.shouldLog(message)) {
+            this.plugin.getPluginLogger().warning(message);
+        } else {
+            this.plugin.getPluginLogger().debug(message);
         }
+    }
+
+    private synchronized boolean shouldLog(String message) {
+        long now = System.currentTimeMillis();
+        if (Objects.equals(message, this.lastWarning) && now - this.lastWarningTime < REPEAT_INTERVAL_MS) {
+            return false;
+        }
+        this.lastWarning = message;
+        this.lastWarningTime = now;
+        return true;
     }
 
     @Override
     public void info(Object o) {
-        STEMApp.LOGGER.INFO(o);
+        this.plugin.getPluginLogger().info(String.valueOf(o));
     }
 
     @Override
     public void debug(Object o) {
-        STEMApp.LOGGER.DEBUG(o);
+        this.plugin.getPluginLogger().debug(String.valueOf(o));
     }
 }

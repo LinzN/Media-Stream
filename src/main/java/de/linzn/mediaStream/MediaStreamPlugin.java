@@ -12,7 +12,6 @@
 
 package de.linzn.mediaStream;
 
-
 import de.linzn.stem.modules.pluginModule.STEMPlugin;
 
 
@@ -27,12 +26,16 @@ public class MediaStreamPlugin extends STEMPlugin {
 
     @Override
     public void onEnable() {
-        this.mediaManager = new MediaManager();
+        /* config defaults first, the manager reads them */
         this.initConfig();
+        this.mediaManager = new MediaManager(this);
     }
 
     @Override
     public void onDisable() {
+        if (this.mediaManager != null) {
+            this.mediaManager.shutdown();
+        }
     }
 
     public MediaManager getMediaManager() {
@@ -41,7 +44,9 @@ public class MediaStreamPlugin extends STEMPlugin {
 
     private void initConfig() {
         this.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
+        this.getDefaultConfig().getInt("wiimDevice.pollIntervalMs", 600);
         this.getDefaultConfig().getString("amplifier.hardwareAddress", "xxxxx");
+        this.getDefaultConfig().getString("led.hardwareAddress", "xxxxx");
         this.getDefaultConfig().save();
     }
 }

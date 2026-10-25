@@ -12,19 +12,28 @@
 
 package de.linzn.mediaStream;
 
+import de.linzn.stem.modules.pluginModule.STEMPlugin;
 import de.linzn.wiim.api.WiiMClient;
 
-
 public class MediaManager {
+
     private final WiiMClient client;
     private final MediaListener mediaListener;
 
-    public MediaManager() {
-        String ipAddress = MediaStreamPlugin.mediaStreamPlugin.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
+    public MediaManager(STEMPlugin plugin) {
+        String ipAddress = plugin.getDefaultConfig().getString("wiimDevice.ipAddress", "10.50.0.99");
+        int pollInterval = Math.max(200, plugin.getDefaultConfig().getInt("wiimDevice.pollIntervalMs", 600));
         this.client = new WiiMClient(ipAddress);
-        this.client.registerLogger(new WiiMStemLogger());
-        this.mediaListener = new MediaListener(client);
-        this.mediaListener.start(600);
+        this.client.registerLogger(new WiiMStemLogger(plugin));
+        this.mediaListener = new MediaListener(plugin, client);
+        this.mediaListener.start(pollInterval);
+    }
+
+    /**
+     * Stops polling the WiiM device.
+     */
+    public void shutdown() {
+        this.mediaListener.stop();
     }
 
     public WiiMClient getClient() {
